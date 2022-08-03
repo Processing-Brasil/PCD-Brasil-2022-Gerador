@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PCD2022</title>
+  <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.8/dist/semantic.min.css">
+  <link rel="stylesheet" href="assets/css/style.css">
+
+  <script src="https://unpkg.com/h264-mp4-encoder/embuild/dist/h264-mp4-encoder.web.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.1/p5.js"></script>
+  <script src="https://unpkg.com/p5.js-svg@1.1.1"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jquery@3.3.1/dist/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fomantic-ui@2.8.8/dist/semantic.min.js"></script>
+  <script src="assets/js/celulas.js"></script>
+  <script src="assets/js/point-picker.js"></script>
+  <script src="assets/js/quadtree.js"></script>
+
+  <script src="assets/js/sketch.js"></script>
+  <script src="assets/js/utils.js"></script>
+  <script src="assets/js/data.js"></script>
+
+
+  <script src="assets/js/ui.js"></script>
+  <script type="text/javascript">
+    const menu_opt = [{
+        title: "PCD 2022",
+        items: [
+          {type: 'file', name: 'load_img', text: 'carrega imagem', callback: carregaImagem },
+          {type: 'button', name: 'save_svg', text: 'salva SVG', callback: save_svg },
+          {type: 'slider', name: 'res_quad', text: 'resolucão quad', min: 30, max: 3000, value: 500},
+          {type: 'checkbox', name: 'inverte', text: "inverte", value: true},
+          {type: 'button', name: 'reset_quad', text: 'reset quad' ,callback: resetQuad},
+
+          {type: 'checkbox', name: 'anima', text: "anima", value: false},
+          {type: 'number', name: 'duracao', text: 'duracao animacao', value: 20,callback: calcFrames},
+          {type: 'button', name: 'set_duracao', text: 'set duracao', callback: calcFrames },
+          {type: 'button', name: 'save_mp4', text: 'salva MP4', callback: comecaGravacao },
+        ]
+      },{
+          title: "Imagem Noise",
+          items: [
+            {type: 'double_number', name: ['widthNoise', 'heightNoise'], text: 'tamanho - pixels', value: [800, 800]},
+            {type: 'slider', name: 'res_noise', text: 'resolucão noise', min: 10, max: 100, value: 50},
+            {type: 'button', name: 'gera_noise', text: 'gera imagem', callback: criaImagem },
+          ]
+        }
+    ]
+
+
+    const ui_right = new UI_window({
+      name: 'menu',
+      // css: {
+      //   left: 'unset',
+      //   right: '0',
+      // },
+      sections: menu_opt,
+      data: ui_data
+    });
+  </script>
+
+</head>
+
+<body>
+  <main>
+  </main>
+</body>
+
+</html>
