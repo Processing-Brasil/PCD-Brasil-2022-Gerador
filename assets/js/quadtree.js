@@ -4,7 +4,6 @@ class Rectangle {
     this.y = y || 0;
     this.w = w || currentImage.width;
     this.h = h || currentImage.height;
-    // this.cell = new celulas[currentCell]()
   }
 
   contains(point) {
@@ -29,12 +28,6 @@ class Rectangle {
     ];
     return subRectangles;
   }
-
-  // draw() {
-  //     // rect(this.x, this.y, this.w, this.h);
-  //     ellipseMode(CORNERS);
-  //     ellipse(this.x, this.y, this.x + this.w, this.y + this.h)
-  // }
 }
 
 class QuadTree {
@@ -48,15 +41,13 @@ class QuadTree {
 
     // DAQUI PRA BAIXO É OBRA DO BURNIER
     this.realColor = this.getColor(this.bounds); // a cor real do pixel -  a this.color q ele coleta tava vindo errado.
-    this.midVec = createVector(this.bounds.x + round(this.bounds.w * 0.5), this.bounds.y + round(this.bounds.h * 0.5))
     let r = this.realColor[0]
     let g = this.realColor[1]
     let b = this.realColor[2]
     this.brilho = ((r + g + b) / 3) / 255
     let randCell = floor(random(celulas.length)) // escolhe uma celula da lista de celulas randomicamente
-    // let brilho = this.brilho
     if(ui_data.inverte) this.brilho = 1-this.brilho
-    this.cell = new celulas[randCell](this.midVec, this.brilho, this.bounds) // cria a celula randomica com as variaveis
+    this.cell = new celulas[randCell](this.brilho, this.bounds) // cria a celula randomica com as variaveis
   }
 
   isSplitted() {
@@ -68,8 +59,6 @@ class QuadTree {
     let x = b.x + round(b.w * 0.5)
     let y = b.y + round(b.h * 0.5)
     return img.get(x, y)
-    // let index = (x + y * img.width) * 4;
-    // return color(img.pixels[index], img.pixels[index + 1], img.pixels[index + 2]);
   }
 
   insert(point) {
@@ -107,10 +96,10 @@ class QuadTree {
   }
 
   draw(p = null) {
-    if (!this.isSplitted() && this.brilho > 0) {
+    if (!this.isSplitted() && this.brilho > 0) { // aqui desenha a celula, SE essa quad for a ultima da lista de subdivisões.
       push()
       if (p != null) this.cell.atualiza(p) // quando o p é null não precisa atualizar
-      this.cell.desenha() // aqui desenha a celula, SE essa quad for a ultima da lista de subdivisões.
+      this.cell.desenha()
       pop()
     }
 

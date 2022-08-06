@@ -1,43 +1,11 @@
 celulas = [
 
-  // function(pos, brilho, bounds) { // QUADRADO TEMPLATE
-  //   //setup das suas variáveis "globais"
-  //   this.pos0 = pos // posição do centro da celula
-  //   this.brilhoOrig = brilho * 255 // brilho que a celula vai representar
-  //   this.bounds = bounds // box que contem: .x, .y, .w, .h - informçaões sobre o tamanho da celula
-  //
-  //   //DAQUI PRA BAIXO É FIRULA
-  //   this.brilhoAtual = 0
-  //   this.tIntro = random(0.1, 0.25)
-  //   this.tOutro = random(0.1, 0.4)
-  //
-  //   this.atualiza = function(tempoAnima) { // função pra atualizar sua celula
-  //     if (tempoAnima < this.tIntro) {
-  //       this.brilhoAtual = map(tempoAnima, 0, this.tIntro, 0, this.brilhoOrig)
-  //     } else if (tempoAnima > 1 - this.tOutro) {
-  //       this.brilhoAtual = map(tempoAnima, 1 - this.tOutro, 1, this.brilhoOrig, 0)
-  //     } else this.brilhoAtual = this.brilhoOrig
-  //   }
-  //
-  //   this.desenha = function() { // função pra desenhar sua celula
-  //     stroke(0)
-  //     fill(this.brilhoAtual)
-  //     rect(this.bounds.x, this.bounds.y, this.bounds.w, this.bounds.h)
-  //   }
-  //
-  //   this.salva = function(c) { // copia da funçao desenha, mas desenhando em um canvas c
-  //     c.stroke(0)
-  //     c.fill(this.brilhoAtual)
-  //     c.rect(this.bounds.x, this.bounds.y, this.bounds.w, this.bounds.h)
-  //   }
-  // },
-
-  function(pos, brilho, bounds) { // QUADRADO PRETO NO FUNDO BRANCO
-    this.pos0 = pos
+  function(brilho, bounds) { // QUADRADO PRETO NO FUNDO BRANCO
     this.brilhoOrig = 1 - brilho
     this.bounds = bounds
 
     //DAQUI PRA BAIXO É FIRULA
+    this.pos0 = createVector(this.bounds.x + round(this.bounds.w * 0.5), this.bounds.y + round(this.bounds.h * 0.5))
     this.brilhoAtual = 0
     this.tIntro = random(0.1, 0.25)
     this.tOutro = random(0.1, 0.4)
@@ -51,29 +19,48 @@ celulas = [
     }
 
     this.desenha = function() { // função pra desenhar sua celula
-      // stroke(0)
       noStroke()
       fill(cor_shape)
-      rectMode(CENTER)
-      rect(this.pos0.x, this.pos0.y, this.bounds.w, this.bounds.h)
-      fill(cor_bg)
-      rect(this.pos0.x, this.pos0.y, this.bounds.w * this.brilhoAtual, this.bounds.h * this.brilhoAtual)
+      beginShape()
+      vertex(this.bounds.x, this.bounds.y)
+      vertex(this.bounds.x + this.bounds.w, this.bounds.y)
+      vertex(this.bounds.x + this.bounds.w, this.bounds.y + this.bounds.h)
+      vertex(this.bounds.x, this.bounds.y + this.bounds.h)
+      beginContour()
+      let wBuraco = this.bounds.w * 0.5 * this.brilhoAtual
+      let hBuraco = this.bounds.h * 0.5 * this.brilhoAtual
+      vertex(this.pos0.x-wBuraco, this.pos0.y-hBuraco)
+      vertex(this.pos0.x-wBuraco, this.pos0.y+hBuraco)
+      vertex(this.pos0.x+wBuraco, this.pos0.y+hBuraco)
+      vertex(this.pos0.x+wBuraco, this.pos0.y-hBuraco)
+      endContour()
+      endShape()
     }
 
     this.salva = function(c) { // copia da funçao desenha, mas desenhando em um canvas c
       c.noStroke()
       c.fill(cor_shape)
-      c.rectMode(CENTER)
-      c.rect(this.pos0.x, this.pos0.y, this.bounds.w, this.bounds.h)
-      c.fill(cor_bg)
-      c.rect(this.pos0.x, this.pos0.y, this.bounds.w * this.brilhoAtual, this.bounds.h * this.brilhoAtual)
+      c.beginShape()
+      c.vertex(this.bounds.x, this.bounds.y)
+      c.vertex(this.bounds.x + this.bounds.w, this.bounds.y)
+      c.vertex(this.bounds.x + this.bounds.w, this.bounds.y + this.bounds.h)
+      c.vertex(this.bounds.x, this.bounds.y + this.bounds.h)
+      c.beginContour()
+      let wBuraco = this.bounds.w * 0.5 * this.brilhoAtual
+      let hBuraco = this.bounds.h * 0.5 * this.brilhoAtual
+      c.vertex(this.pos0.x-wBuraco, this.pos0.y-hBuraco)
+      c.vertex(this.pos0.x-wBuraco, this.pos0.y+hBuraco)
+      c.vertex(this.pos0.x+wBuraco, this.pos0.y+hBuraco)
+      c.vertex(this.pos0.x+wBuraco, this.pos0.y-hBuraco)
+      c.endContour()
+      c.endShape()
     }
   },
 
-  function(pos, brilho, bounds) { // QUADRADO INTERPOLA ENTRE BRANCO E PRETO?
-    this.pos0 = pos
+  function(brilho, bounds) { // QUADRADO INTERPOLA ENTRE BRANCO E PRETO?
     this.brilhoOrig = brilho
     this.bounds = bounds
+    this.pos0 = createVector(this.bounds.x + round(this.bounds.w * 0.5), this.bounds.y + round(this.bounds.h * 0.5))
 
     //DAQUI PRA BAIXO É FIRULA
     this.brilhoAtual = 0
@@ -90,11 +77,7 @@ celulas = [
     }
 
     this.desenha = function() { // função pra desenhar sua celula
-      // stroke(0)
       noStroke()
-      // fill(255,0,0)
-      // rectMode(CENTER)
-      // rect(this.bounds.x, this.bounds.y, this.bounds.w, this.bounds.h)
       fill(cor_shape)
       if (this.direcao == 0) {
         rect(this.bounds.x, this.bounds.y, this.bounds.w * this.brilhoAtual, this.bounds.h)
@@ -126,10 +109,10 @@ celulas = [
     }
   },
 
-  function(pos, brilho, bounds) { // QUADRADO INTERPOLA ENTRE BRANCO E PRETO 2?
-    this.pos0 = pos
+  function(brilho, bounds) { // QUADRADO INTERPOLA ENTRE BRANCO E PRETO 2?
     this.brilhoOrig = brilho
     this.bounds = bounds
+    this.pos0 = createVector(this.bounds.x + round(this.bounds.w * 0.5), this.bounds.y + round(this.bounds.h * 0.5))
 
     //DAQUI PRA BAIXO É FIRULA
     this.brilhoAtual = 0
@@ -228,10 +211,10 @@ celulas = [
   },
 
 
-  function(pos, brilho, bounds) { // RISCOS EM FLOWFIELD
-    this.pos0 = pos
+  function(brilho, bounds) { // RISCOS EM FLOWFIELD
     this.brilhoOrig = brilho * 255
     this.bounds = bounds
+    this.pos0 = createVector(this.bounds.x + round(this.bounds.w * 0.5), this.bounds.y + round(this.bounds.h * 0.5))
     this.brilhoAtual = 0
     this.tIntro = random(0.1, 0.3)
     this.tOutro = random(0.1, 0.3)
@@ -274,11 +257,12 @@ celulas = [
     }
   },
 
-  function(pos, brilho, bounds) { // CIRCULAR FLOW FIELD
-    this.posR = pos.copy()
-    this.posD = pos.copy()
-    this.pos0 = pos.copy()
+  function(brilho, bounds) { // CIRCULAR FLOW FIELD
+    this.bounds = bounds
     this.brilho = brilho
+    this.pos0 = createVector(this.bounds.x + round(this.bounds.w * 0.5), this.bounds.y + round(this.bounds.h * 0.5))
+    this.posR = this.pos0.copy()
+    this.posD = this.pos0.copy()
     this.tamCelula = max(bounds.w,bounds.h)
     this.raioD = 0
     this.raioR = 0
@@ -328,10 +312,10 @@ celulas = [
     }
   },
 
-  function(pos, brilho, bounds) { // CRIPTICO
-    this.pos0 = pos
+  function(brilho, bounds) { // CRIPTICO
     this.brilhoOrig = brilho * 255
     this.bounds = bounds
+    this.pos0 = createVector(this.bounds.x + round(this.bounds.w * 0.5), this.bounds.y + round(this.bounds.h * 0.5))
     this.brilhoAtual = 0
     this.tIntro = random(0.2, 0.4)
     this.tOutro = random(0.2, 0.4)

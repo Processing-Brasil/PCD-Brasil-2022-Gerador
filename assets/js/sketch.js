@@ -20,7 +20,7 @@ function setup() {
   let cvn = createCanvas(windowWidth, windowHeight)
   cvn.position(300,0)
   setCores()
-  resetQuad(0) // Nessa função que o quad é criado > utils.js
+  resetQuad() // Nessa função que o quad é criado > utils.js
 }
 
 function draw() {
@@ -30,7 +30,7 @@ function draw() {
   if (salvaVideoMP4) {
     fill(255, 0, 0)
     p = norm(nFrames, 0, totalFrames - 1)
-    text("GRAVANDO: " + nFrames + " / " + totalFrames + "/n" + p, currentImage.width + 10, 20)
+    text("GRAVANDO: " + nFrames + " / " + totalFrames + "\n" + p, currentImage.width + 10, 20)
     salvaFrameMP4(p)
   } else {
     if (ui_data.anima) p = norm(nFrames % totalFrames, 0, totalFrames - 1)

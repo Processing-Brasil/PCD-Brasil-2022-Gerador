@@ -71,7 +71,7 @@ function desenhaNoise(){
 function salvaFrameMP4(p) {
   var tela = createGraphics(currentImage.width, currentImage.height);
   tela.pixelDensity(1);
-  tela.background(0)
+  tela.background(cor_bg)
 
   qTree.save(tela, p)
 
