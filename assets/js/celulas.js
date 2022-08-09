@@ -1,4 +1,43 @@
 celulas = [
+  // function(brilho, bounds) {
+  //   //  brilho - varia entre 0-1. é o valor de luminosidade da célula
+  //   //
+  //   //  bounds contem:
+  //   //
+  //   //  bounds.x , bounds.y - posição do canto superior esquerdo
+  //   //  ↓
+  //   //  ┏━━━━━━━━━━━━━━━━━━━━━┓
+  //   //  ┃                     ┃
+  //   //  ┃                     ┃
+  //   //  ┃                     ┃
+  //   //  ┃                     ┃ bounds.h - altura da celula
+  //   //  ┃                     ┃
+  //   //  ┃                     ┃
+  //   //  ┃                     ┃
+  //   //  ┗━━━━━━━━━━━━━━━━━━━━━┛
+  //   //          bounds.w - largura da celulas
+  //
+  //
+  //
+  //   this.atualiza = function(tempoAnima) {
+  //     //  essa função é chamada a cada frame. Aqui você pode alterar o desenho da sua célula conforme o tempoAnima.
+  //     //  tempoAnima varia de 0-1 conforme o tempo da animação. 0 - primeiro frame, 0.5 - metade da animação, 1 - fim da animação
+  //     //  idealmente, a celula fica 100% acesa e no seu quadrado a maior parte do tempo - pra textura manter consistencia durante boa parte do tempo
+  //     //
+  //   }
+  //
+  //   this.desenha = function() {
+  //     //  aqui você desenha sua célula
+  //     //  use cor_shape no desenho das suas formas
+  //
+  //   }
+  //
+  //   this.salva = function(c) {
+  //     //  essa função é uma cópia do desenha()
+  //     //  fill(corShape) vira -> c.fill(corShape)
+  //
+  //   }
+  // },
 
   function(brilho, bounds) { // QUADRADO PRETO NO FUNDO BRANCO
     this.brilhoOrig = 1 - brilho
@@ -29,10 +68,10 @@ celulas = [
       beginContour()
       let wBuraco = this.bounds.w * 0.5 * this.brilhoAtual
       let hBuraco = this.bounds.h * 0.5 * this.brilhoAtual
-      vertex(this.pos0.x-wBuraco, this.pos0.y-hBuraco)
-      vertex(this.pos0.x-wBuraco, this.pos0.y+hBuraco)
-      vertex(this.pos0.x+wBuraco, this.pos0.y+hBuraco)
-      vertex(this.pos0.x+wBuraco, this.pos0.y-hBuraco)
+      vertex(this.pos0.x - wBuraco, this.pos0.y - hBuraco)
+      vertex(this.pos0.x - wBuraco, this.pos0.y + hBuraco)
+      vertex(this.pos0.x + wBuraco, this.pos0.y + hBuraco)
+      vertex(this.pos0.x + wBuraco, this.pos0.y - hBuraco)
       endContour()
       endShape()
     }
@@ -48,10 +87,10 @@ celulas = [
       c.beginContour()
       let wBuraco = this.bounds.w * 0.5 * this.brilhoAtual
       let hBuraco = this.bounds.h * 0.5 * this.brilhoAtual
-      c.vertex(this.pos0.x-wBuraco, this.pos0.y-hBuraco)
-      c.vertex(this.pos0.x-wBuraco, this.pos0.y+hBuraco)
-      c.vertex(this.pos0.x+wBuraco, this.pos0.y+hBuraco)
-      c.vertex(this.pos0.x+wBuraco, this.pos0.y-hBuraco)
+      c.vertex(this.pos0.x - wBuraco, this.pos0.y - hBuraco)
+      c.vertex(this.pos0.x - wBuraco, this.pos0.y + hBuraco)
+      c.vertex(this.pos0.x + wBuraco, this.pos0.y + hBuraco)
+      c.vertex(this.pos0.x + wBuraco, this.pos0.y - hBuraco)
       c.endContour()
       c.endShape()
     }
@@ -263,7 +302,7 @@ celulas = [
     this.pos0 = createVector(this.bounds.x + round(this.bounds.w * 0.5), this.bounds.y + round(this.bounds.h * 0.5))
     this.posR = this.pos0.copy()
     this.posD = this.pos0.copy()
-    this.tamCelula = max(bounds.w,bounds.h)
+    this.tamCelula = max(bounds.w, bounds.h)
     this.raioD = 0
     this.raioR = 0
     this.maxRaio = map(brilho, 0, 1, 0, this.tamCelula * 0.5)
