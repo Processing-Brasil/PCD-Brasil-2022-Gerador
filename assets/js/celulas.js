@@ -40,38 +40,44 @@ celulas = [
   // },
 
   function(brilho, bounds) { // QUADRADO PRETO NO FUNDO BRANCO
-    this.brilhoOrig = 1 - brilho
+    this.brilho = 1 - brilho
     this.bounds = bounds
 
+    this.randSeed = random(100)
     //DAQUI PRA BAIXO É FIRULA
     this.pos0 = createVector(this.bounds.x + round(this.bounds.w * 0.5), this.bounds.y + round(this.bounds.h * 0.5))
-    this.brilhoAtual = 0
-    this.tIntro = random(0.1, 0.25)
-    this.tOutro = random(0.1, 0.4)
+    this.maxA = map(sq(brilho), 1, 0, PI, 0)
 
     this.atualiza = function(tempoAnima) { // função pra atualizar sua celula
-      if (tempoAnima < this.tIntro) {
-        this.brilhoAtual = map(tempoAnima, 0, this.tIntro, 1, this.brilhoOrig)
-      } else if (tempoAnima > 1 - this.tOutro) {
-        this.brilhoAtual = map(tempoAnima, 1 - this.tOutro, 1, this.brilhoOrig, 1)
-      } else this.brilhoAtual = this.brilhoOrig
+      this.a = sin(tempoAnima * TWO_PI + this.randSeed)*this.maxA
     }
 
     this.desenha = function() { // função pra desenhar sua celula
       noStroke()
       fill(cor_shape)
+      translate(this.pos0.x, this.pos0.y)
+      let halfW = this.bounds.w*0.5
+      let halfH = this.bounds.h*0.5
       beginShape()
-      vertex(this.bounds.x, this.bounds.y)
-      vertex(this.bounds.x + this.bounds.w, this.bounds.y)
-      vertex(this.bounds.x + this.bounds.w, this.bounds.y + this.bounds.h)
-      vertex(this.bounds.x, this.bounds.y + this.bounds.h)
+      vertex(-halfW, -halfH)
+      vertex(halfW, -halfH)
+      vertex(halfW, halfH)
+      vertex(-halfW, halfH)
       beginContour()
-      let wBuraco = this.bounds.w * 0.5 * this.brilhoAtual
-      let hBuraco = this.bounds.h * 0.5 * this.brilhoAtual
-      vertex(this.pos0.x - wBuraco, this.pos0.y - hBuraco)
-      vertex(this.pos0.x - wBuraco, this.pos0.y + hBuraco)
-      vertex(this.pos0.x + wBuraco, this.pos0.y + hBuraco)
-      vertex(this.pos0.x + wBuraco, this.pos0.y - hBuraco)
+      let wBuraco = this.bounds.w * 0.5 * this.brilho
+      let hBuraco = this.bounds.h * 0.5 * this.brilho
+      let v1B = createVector(-wBuraco, -hBuraco)
+      let v2B = createVector(-wBuraco, hBuraco)
+      let v3B = createVector(wBuraco, hBuraco)
+      let v4B = createVector(wBuraco, -hBuraco)
+      v1B.rotate(this.a)
+      v2B.rotate(this.a)
+      v3B.rotate(this.a)
+      v4B.rotate(this.a)
+      vertex(v1B.x, v1B.y)
+      vertex(v2B.x, v2B.y)
+      vertex(v3B.x, v3B.y)
+      vertex(v4B.x, v4B.y)
       endContour()
       endShape()
     }
@@ -79,18 +85,29 @@ celulas = [
     this.salva = function(c) { // copia da funçao desenha, mas desenhando em um canvas c
       c.noStroke()
       c.fill(cor_shape)
+      c.translate(this.pos0.x, this.pos0.y)
+      let halfW = this.bounds.w*0.5
+      let halfH = this.bounds.h*0.5
       c.beginShape()
-      c.vertex(this.bounds.x, this.bounds.y)
-      c.vertex(this.bounds.x + this.bounds.w, this.bounds.y)
-      c.vertex(this.bounds.x + this.bounds.w, this.bounds.y + this.bounds.h)
-      c.vertex(this.bounds.x, this.bounds.y + this.bounds.h)
+      c.vertex(-halfW, -halfH)
+      c.vertex(halfW, -halfH)
+      c.vertex(halfW, halfH)
+      c.vertex(-halfW, halfH)
       c.beginContour()
-      let wBuraco = this.bounds.w * 0.5 * this.brilhoAtual
-      let hBuraco = this.bounds.h * 0.5 * this.brilhoAtual
-      c.vertex(this.pos0.x - wBuraco, this.pos0.y - hBuraco)
-      c.vertex(this.pos0.x - wBuraco, this.pos0.y + hBuraco)
-      c.vertex(this.pos0.x + wBuraco, this.pos0.y + hBuraco)
-      c.vertex(this.pos0.x + wBuraco, this.pos0.y - hBuraco)
+      let wBuraco = this.bounds.w * 0.5 * this.brilho
+      let hBuraco = this.bounds.h * 0.5 * this.brilho
+      let v1B = createVector(-wBuraco, -hBuraco)
+      let v2B = createVector(-wBuraco, hBuraco)
+      let v3B = createVector(wBuraco, hBuraco)
+      let v4B = createVector(wBuraco, -hBuraco)
+      v1B.rotate(this.a)
+      v2B.rotate(this.a)
+      v3B.rotate(this.a)
+      v4B.rotate(this.a)
+      c.vertex(v1B.x, v1B.y)
+      c.vertex(v2B.x, v2B.y)
+      c.vertex(v3B.x, v3B.y)
+      c.vertex(v4B.x, v4B.y)
       c.endContour()
       c.endShape()
     }
@@ -103,16 +120,18 @@ celulas = [
 
     //DAQUI PRA BAIXO É FIRULA
     this.brilhoAtual = 0
-    this.tIntro = random(0.1, 0.25)
-    this.tOutro = random(0.1, 0.4)
+    // this.tIntro = random(0.1, 0.25)
+    // this.tOutro = random(0.1, 0.4)
     this.direcao = floor(random(4))
+    this.randSeed = random(100)
 
     this.atualiza = function(tempoAnima) { // função pra atualizar sua celula
-      if (tempoAnima < this.tIntro) {
-        this.brilhoAtual = map(tempoAnima, 0, this.tIntro, 0, this.brilhoOrig)
-      } else if (tempoAnima > 1 - this.tOutro) {
-        this.brilhoAtual = map(tempoAnima, 1 - this.tOutro, 1, this.brilhoOrig, 0)
-      } else this.brilhoAtual = this.brilhoOrig
+      this.brilhoAtual = map(sin(tempoAnima*TWO_PI*2+this.randSeed), -1, 1, this.brilhoOrig*0.8, this.brilhoOrig*1.1)
+      // if (tempoAnima < this.tIntro) {
+      //   this.brilhoAtual = map(tempoAnima, 0, this.tIntro, 0, this.brilhoOrig)
+      // } else if (tempoAnima > 1 - this.tOutro) {
+      //   this.brilhoAtual = map(tempoAnima, 1 - this.tOutro, 1, this.brilhoOrig, 0)
+      // } else this.brilhoAtual = this.brilhoOrig
     }
 
     this.desenha = function() { // função pra desenhar sua celula
@@ -163,8 +182,10 @@ celulas = [
     // this.pos2 = createVector(this.bounds.x + this.bounds.w, this.bounds.y + this.bounds.h)
     this.x2 = this.bounds.x + this.bounds.w
     this.y2 = this.bounds.y + this.bounds.h
+    this.randSeed = random(1)
 
     this.atualiza = function(tempoAnima) { // função pra atualizar sua celula
+      tempoAnima = (tempoAnima+ this.randSeed)%1
       if (tempoAnima < this.tIntro) {
         this.brilhoAtual = map(tempoAnima, 0, this.tIntro, 0, this.brilhoOrig)
       } else if (tempoAnima > 1 - this.tOutro) {
@@ -254,20 +275,24 @@ celulas = [
     this.brilhoOrig = brilho * 255
     this.bounds = bounds
     this.pos0 = createVector(this.bounds.x + round(this.bounds.w * 0.5), this.bounds.y + round(this.bounds.h * 0.5))
-    this.brilhoAtual = 0
-    this.tIntro = random(0.1, 0.3)
-    this.tOutro = random(0.1, 0.3)
+    this.brilhoAtual = this.brilhoOrig
+    // this.tIntro = random(0.1, 0.3)
+    // this.tOutro = random(0.1, 0.3)
     this.angle = 0
     this.dis = this.bounds.w / 5
+    this.randSeed = random(100)
 
     this.atualiza = function(tempoAnima) {
-      if (tempoAnima < this.tIntro) {
-        this.brilhoAtual = map(tempoAnima, 0, this.tIntro, 0, this.brilhoOrig)
-      } else if (tempoAnima > 1 - this.tOutro) {
-        this.brilhoAtual = map(tempoAnima, 1 - this.tOutro, 1, this.brilhoOrig, 0)
-      } else this.brilhoAtual = this.brilhoOrig
-      let res = 0.001
-      this.angle = noise(this.pos0.x * res, this.pos0.y * res, frameCount * 0.001) * 2 * TWO_PI
+      // if (tempoAnima < this.tIntro) {
+      //   this.brilhoAtual = map(tempoAnima, 0, this.tIntro, 0, this.brilhoOrig)
+      // } else if (tempoAnima > 1 - this.tOutro) {
+      //   this.brilhoAtual = map(tempoAnima, 1 - this.tOutro, 1, this.brilhoOrig, 0)
+      // } else this.brilhoAtual = this.brilhoOrig
+      let res = 0.05
+      let a = tempoAnima*TWO_PI
+      let xNoise = cos(a)*res+ this.randSeed
+      let yNoise = sin(a)*res + this.randSeed
+      this.angle = noise(xNoise, yNoise) * 2 * TWO_PI
       this.strk = map(this.brilhoAtual, 0, 255, 0, this.dis)
     }
 
@@ -307,9 +332,10 @@ celulas = [
     this.raioR = 0
     this.maxRaio = map(brilho, 0, 1, 0, this.tamCelula * 0.5)
     this.tStartMotion = random(0.5, 0.9)
-    this.random = random(PI)
+    this.random = random(1)
 
     this.atualiza = function(tempoAnima) {
+      tempoAnima = (tempoAnima+this.random)%1
       let tIntro = 0.1
       if (tempoAnima < tIntro) {
         this.raioD = map(tempoAnima, 0, tIntro, 0, this.maxRaio)
@@ -321,14 +347,16 @@ celulas = [
         let res = 0.005
         let a = noise(this.posD.x * res, this.posD.y * res) * 2 * TWO_PI
         let v = p5.Vector.fromAngle(a)
-        v.setMag(tempoAnima * 5)
+        v.setMag(3)
         this.posD.add(v)
       } else this.posD = this.pos0.copy()
       if (tempoAnima == 0) {
         this.reset()
       }
-      this.posR.lerp(this.posD, 0.1)
-      this.raioR = lerp(this.raioR, this.raioD, 0.1)
+      // this.posR.lerp(this.posD, 0.1)
+      // this.raioR = lerp(this.raioR, this.raioD, 0.1)
+      this.raioR = this.raioD
+      this.posR = this.posD
     }
 
     this.reset = function() {
@@ -356,11 +384,12 @@ celulas = [
     this.bounds = bounds
     this.pos0 = createVector(this.bounds.x + round(this.bounds.w * 0.5), this.bounds.y + round(this.bounds.h * 0.5))
     this.brilhoAtual = 0
-    this.tIntro = random(0.2, 0.4)
-    this.tOutro = random(0.2, 0.4)
+    this.tIntro = random(0.1, 0.2)
+    this.tOutro = random(0.1, 0.2)
+    this.randSeed = random(1)
 
     this.atualiza = function(tempoAnima) {
-
+      tempoAnima = (tempoAnima+this.randSeed)%1
       if (tempoAnima < this.tIntro) {
         this.brilhoAtual = map(tempoAnima, 0, this.tIntro, 0, this.brilhoOrig)
       } else if (tempoAnima > 1 - this.tOutro) {

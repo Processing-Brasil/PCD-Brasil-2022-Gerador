@@ -105,4 +105,9 @@ class QuadTree {
 
     this.subtrees.forEach(tree => tree.draw(p)); // se tiver subdivisões, desenha elas
   }
+
+  resetCell(){
+    this.cell.atualiza(0)
+    this.subtrees.forEach(tree => tree.resetCell());
+  }
 }

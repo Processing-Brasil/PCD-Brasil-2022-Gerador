@@ -14,8 +14,14 @@ function randCell(n) {
   else return nRand
 }
 
+function triggerGravacao() {
+  triggerComecaGrav = true
+}
+
 function comecaGravacao() {
+  triggerComecaGrav = false
   criaEncoder();
+  qTree.resetCell()
   nFrames = 0;
   // totalFrames = ui_data.duracaoVideo * ui_data.fps;
   salvaVideoMP4 = true
@@ -77,7 +83,7 @@ function salvaFrameMP4(p) {
 
   encoder.addFrameRgba(tela.drawingContext.getImageData(0, 0, encoder.width, encoder.height).data);
   tela.remove();
-  if (nFrames < totalFrames - 1) nFrames++;
+  if (nFrames < totalFrames) nFrames++;
   else {
     salvaVideoMP4 = false;
     nFrames = 0;
@@ -95,7 +101,6 @@ function salvaFrameMP4(p) {
 }
 
 function criaEncoder() {
-
   HME.createH264MP4Encoder().then(enc => {
     encoder = enc
     encoder.outputFilename = 'PCD2022'
@@ -105,7 +110,7 @@ function criaEncoder() {
     encoder.kbps = 40000 // video quality
     // encoder.quantizationParameter = 10
     encoder.speed = 0
-    encoder.groupOfPictures = 3 // lower if you have fast actions.
+    encoder.groupOfPictures = 4 // lower if you have fast actions.
     encoder.initialize()
   });
 }

@@ -33,10 +33,10 @@
           {type: 'checkbox', name: 'inverte', text: "inverte", value: true},
           {type: 'button', name: 'reset_quad', text: 'reset quad' ,callback: resetQuad},
 
-          {type: 'checkbox', name: 'anima', text: "anima", value: false},
+          {type: 'checkbox', name: 'anima', text: "anima", value: true},
           {type: 'number', name: 'duracao', text: 'duracao animacao', value: 20,callback: calcFrames},
           {type: 'button', name: 'set_duracao', text: 'set duracao', callback: calcFrames },
-          {type: 'button', name: 'save_mp4', text: 'salva MP4', callback: comecaGravacao },
+          {type: 'button', name: 'save_mp4', text: 'salva MP4', callback: triggerGravacao },
         ]
       },{
           title: "Imagem Noise",
