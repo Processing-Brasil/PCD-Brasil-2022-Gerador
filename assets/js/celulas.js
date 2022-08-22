@@ -1,100 +1,141 @@
 celulas = [
-
-  // function(pos, brilho, bounds) { // QUADRADO TEMPLATE
-  //   //setup das suas variáveis "globais"
-  //   this.pos0 = pos // posição do centro da celula
-  //   this.brilhoOrig = brilho * 255 // brilho que a celula vai representar
-  //   this.bounds = bounds // box que contem: .x, .y, .w, .h - informçaões sobre o tamanho da celula
+  // function(brilho, bounds) {
+  //   //  brilho - varia entre 0-1. é o valor de luminosidade da célula
+  //   //
+  //   //  bounds contem:
+  //   //
+  //   //  bounds.x , bounds.y - posição do canto superior esquerdo
+  //   //  ↓
+  //   //  ┏━━━━━━━━━━━━━━━━━━━━━┓
+  //   //  ┃                     ┃
+  //   //  ┃                     ┃
+  //   //  ┃                     ┃
+  //   //  ┃                     ┃ bounds.h - altura da celula
+  //   //  ┃                     ┃
+  //   //  ┃                     ┃
+  //   //  ┃                     ┃
+  //   //  ┗━━━━━━━━━━━━━━━━━━━━━┛
+  //   //          bounds.w - largura da celulas
   //
-  //   //DAQUI PRA BAIXO É FIRULA
-  //   this.brilhoAtual = 0
-  //   this.tIntro = random(0.1, 0.25)
-  //   this.tOutro = random(0.1, 0.4)
   //
-  //   this.atualiza = function(tempoAnima) { // função pra atualizar sua celula
-  //     if (tempoAnima < this.tIntro) {
-  //       this.brilhoAtual = map(tempoAnima, 0, this.tIntro, 0, this.brilhoOrig)
-  //     } else if (tempoAnima > 1 - this.tOutro) {
-  //       this.brilhoAtual = map(tempoAnima, 1 - this.tOutro, 1, this.brilhoOrig, 0)
-  //     } else this.brilhoAtual = this.brilhoOrig
+  //
+  //   this.atualiza = function(tempoAnima) {
+  //     //  essa função é chamada a cada frame. Aqui você pode alterar o desenho da sua célula conforme o tempoAnima.
+  //     //  tempoAnima varia de 0-1 conforme o tempo da animação. 0 - primeiro frame, 0.5 - metade da animação, 1 - fim da animação
+  //     //  idealmente, a celula fica 100% acesa e no seu quadrado a maior parte do tempo - pra textura manter consistencia durante boa parte do tempo
+  //     //
   //   }
   //
-  //   this.desenha = function() { // função pra desenhar sua celula
-  //     stroke(0)
-  //     fill(this.brilhoAtual)
-  //     rect(this.bounds.x, this.bounds.y, this.bounds.w, this.bounds.h)
+  //   this.desenha = function() {
+  //     //  aqui você desenha sua célula
+  //     //  use cor_shape no desenho das suas formas
+  //
   //   }
   //
-  //   this.salva = function(c) { // copia da funçao desenha, mas desenhando em um canvas c
-  //     c.stroke(0)
-  //     c.fill(this.brilhoAtual)
-  //     c.rect(this.bounds.x, this.bounds.y, this.bounds.w, this.bounds.h)
+  //   this.salva = function(c) {
+  //     //  essa função é uma cópia do desenha()
+  //     //  fill(cor_shape) vira -> c.fill(cor_shape)
+  //
   //   }
   // },
 
-  function(pos, brilho, bounds) { // QUADRADO PRETO NO FUNDO BRANCO
-    this.pos0 = pos
-    this.brilhoOrig = 1 - brilho
+  function(brilho, bounds) { // QUADRADO PRETO NO FUNDO BRANCO
+    this.brilho = 1 - brilho
     this.bounds = bounds
 
+    this.randSeed = random(100)
     //DAQUI PRA BAIXO É FIRULA
-    this.brilhoAtual = 0
-    this.tIntro = random(0.1, 0.25)
-    this.tOutro = random(0.1, 0.4)
+    this.pos0 = createVector(this.bounds.x + round(this.bounds.w * 0.5), this.bounds.y + round(this.bounds.h * 0.5))
+    this.maxA = map(sq(brilho), 1, 0, PI, 0)
 
     this.atualiza = function(tempoAnima) { // função pra atualizar sua celula
-      if (tempoAnima < this.tIntro) {
-        this.brilhoAtual = map(tempoAnima, 0, this.tIntro, 1, this.brilhoOrig)
-      } else if (tempoAnima > 1 - this.tOutro) {
-        this.brilhoAtual = map(tempoAnima, 1 - this.tOutro, 1, this.brilhoOrig, 1)
-      } else this.brilhoAtual = this.brilhoOrig
+      this.a = sin(tempoAnima * TWO_PI + this.randSeed) * this.maxA
     }
 
     this.desenha = function() { // função pra desenhar sua celula
-      // stroke(0)
       noStroke()
       fill(cor_shape)
-      rectMode(CENTER)
-      rect(this.pos0.x, this.pos0.y, this.bounds.w, this.bounds.h)
-      fill(cor_bg)
-      rect(this.pos0.x, this.pos0.y, this.bounds.w * this.brilhoAtual, this.bounds.h * this.brilhoAtual)
+      translate(this.pos0.x, this.pos0.y)
+      let halfW = this.bounds.w * 0.5
+      let halfH = this.bounds.h * 0.5
+      beginShape()
+      vertex(-halfW, -halfH)
+      vertex(halfW, -halfH)
+      vertex(halfW, halfH)
+      vertex(-halfW, halfH)
+      beginContour()
+      let wBuraco = this.bounds.w * 0.5 * this.brilho
+      let hBuraco = this.bounds.h * 0.5 * this.brilho
+      let v1B = createVector(-wBuraco, -hBuraco)
+      let v2B = createVector(-wBuraco, hBuraco)
+      let v3B = createVector(wBuraco, hBuraco)
+      let v4B = createVector(wBuraco, -hBuraco)
+      v1B.rotate(this.a)
+      v2B.rotate(this.a)
+      v3B.rotate(this.a)
+      v4B.rotate(this.a)
+      vertex(v1B.x, v1B.y)
+      vertex(v2B.x, v2B.y)
+      vertex(v3B.x, v3B.y)
+      vertex(v4B.x, v4B.y)
+      endContour()
+      endShape()
     }
 
     this.salva = function(c) { // copia da funçao desenha, mas desenhando em um canvas c
       c.noStroke()
       c.fill(cor_shape)
-      c.rectMode(CENTER)
-      c.rect(this.pos0.x, this.pos0.y, this.bounds.w, this.bounds.h)
-      c.fill(cor_bg)
-      c.rect(this.pos0.x, this.pos0.y, this.bounds.w * this.brilhoAtual, this.bounds.h * this.brilhoAtual)
+      c.translate(this.pos0.x, this.pos0.y)
+      let halfW = this.bounds.w * 0.5
+      let halfH = this.bounds.h * 0.5
+      c.beginShape()
+      c.vertex(-halfW, -halfH)
+      c.vertex(halfW, -halfH)
+      c.vertex(halfW, halfH)
+      c.vertex(-halfW, halfH)
+      c.beginContour()
+      let wBuraco = this.bounds.w * 0.5 * this.brilho
+      let hBuraco = this.bounds.h * 0.5 * this.brilho
+      let v1B = createVector(-wBuraco, -hBuraco)
+      let v2B = createVector(-wBuraco, hBuraco)
+      let v3B = createVector(wBuraco, hBuraco)
+      let v4B = createVector(wBuraco, -hBuraco)
+      v1B.rotate(this.a)
+      v2B.rotate(this.a)
+      v3B.rotate(this.a)
+      v4B.rotate(this.a)
+      c.vertex(v1B.x, v1B.y)
+      c.vertex(v2B.x, v2B.y)
+      c.vertex(v3B.x, v3B.y)
+      c.vertex(v4B.x, v4B.y)
+      c.endContour()
+      c.endShape()
     }
   },
 
-  function(pos, brilho, bounds) { // QUADRADO INTERPOLA ENTRE BRANCO E PRETO?
-    this.pos0 = pos
+  function(brilho, bounds) { // QUADRADO INTERPOLA ENTRE BRANCO E PRETO?
     this.brilhoOrig = brilho
     this.bounds = bounds
+    this.pos0 = createVector(this.bounds.x + round(this.bounds.w * 0.5), this.bounds.y + round(this.bounds.h * 0.5))
 
     //DAQUI PRA BAIXO É FIRULA
     this.brilhoAtual = 0
-    this.tIntro = random(0.1, 0.25)
-    this.tOutro = random(0.1, 0.4)
+    // this.tIntro = random(0.1, 0.25)
+    // this.tOutro = random(0.1, 0.4)
     this.direcao = floor(random(4))
+    this.randSeed = random(100)
 
     this.atualiza = function(tempoAnima) { // função pra atualizar sua celula
-      if (tempoAnima < this.tIntro) {
-        this.brilhoAtual = map(tempoAnima, 0, this.tIntro, 0, this.brilhoOrig)
-      } else if (tempoAnima > 1 - this.tOutro) {
-        this.brilhoAtual = map(tempoAnima, 1 - this.tOutro, 1, this.brilhoOrig, 0)
-      } else this.brilhoAtual = this.brilhoOrig
+      this.brilhoAtual = map(sin(tempoAnima * TWO_PI * 2 + this.randSeed), -1, 1, this.brilhoOrig * 0.8, this.brilhoOrig * 1.1)
+      // if (tempoAnima < this.tIntro) {
+      //   this.brilhoAtual = map(tempoAnima, 0, this.tIntro, 0, this.brilhoOrig)
+      // } else if (tempoAnima > 1 - this.tOutro) {
+      //   this.brilhoAtual = map(tempoAnima, 1 - this.tOutro, 1, this.brilhoOrig, 0)
+      // } else this.brilhoAtual = this.brilhoOrig
     }
 
     this.desenha = function() { // função pra desenhar sua celula
-      // stroke(0)
       noStroke()
-      // fill(255,0,0)
-      // rectMode(CENTER)
-      // rect(this.bounds.x, this.bounds.y, this.bounds.w, this.bounds.h)
       fill(cor_shape)
       if (this.direcao == 0) {
         rect(this.bounds.x, this.bounds.y, this.bounds.w * this.brilhoAtual, this.bounds.h)
@@ -126,10 +167,10 @@ celulas = [
     }
   },
 
-  function(pos, brilho, bounds) { // QUADRADO INTERPOLA ENTRE BRANCO E PRETO 2?
-    this.pos0 = pos
+  function(brilho, bounds) { // QUADRADO INTERPOLA ENTRE BRANCO E PRETO 2?
     this.brilhoOrig = brilho
     this.bounds = bounds
+    this.pos0 = createVector(this.bounds.x + round(this.bounds.w * 0.5), this.bounds.y + round(this.bounds.h * 0.5))
 
     //DAQUI PRA BAIXO É FIRULA
     this.brilhoAtual = 0
@@ -141,8 +182,10 @@ celulas = [
     // this.pos2 = createVector(this.bounds.x + this.bounds.w, this.bounds.y + this.bounds.h)
     this.x2 = this.bounds.x + this.bounds.w
     this.y2 = this.bounds.y + this.bounds.h
+    this.randSeed = random(1)
 
     this.atualiza = function(tempoAnima) { // função pra atualizar sua celula
+      tempoAnima = (tempoAnima + this.randSeed) % 1
       if (tempoAnima < this.tIntro) {
         this.brilhoAtual = map(tempoAnima, 0, this.tIntro, 0, this.brilhoOrig)
       } else if (tempoAnima > 1 - this.tOutro) {
@@ -228,24 +271,28 @@ celulas = [
   },
 
 
-  function(pos, brilho, bounds) { // RISCOS EM FLOWFIELD
-    this.pos0 = pos
+  function(brilho, bounds) { // RISCOS EM FLOWFIELD
     this.brilhoOrig = brilho * 255
     this.bounds = bounds
-    this.brilhoAtual = 0
-    this.tIntro = random(0.1, 0.3)
-    this.tOutro = random(0.1, 0.3)
+    this.pos0 = createVector(this.bounds.x + round(this.bounds.w * 0.5), this.bounds.y + round(this.bounds.h * 0.5))
+    this.brilhoAtual = this.brilhoOrig
+    // this.tIntro = random(0.1, 0.3)
+    // this.tOutro = random(0.1, 0.3)
     this.angle = 0
     this.dis = this.bounds.w / 5
+    this.randSeed = random(100)
 
     this.atualiza = function(tempoAnima) {
-      if (tempoAnima < this.tIntro) {
-        this.brilhoAtual = map(tempoAnima, 0, this.tIntro, 0, this.brilhoOrig)
-      } else if (tempoAnima > 1 - this.tOutro) {
-        this.brilhoAtual = map(tempoAnima, 1 - this.tOutro, 1, this.brilhoOrig, 0)
-      } else this.brilhoAtual = this.brilhoOrig
-      let res = 0.001
-      this.angle = noise(this.pos0.x * res, this.pos0.y * res, frameCount * 0.001) * 2 * TWO_PI
+      // if (tempoAnima < this.tIntro) {
+      //   this.brilhoAtual = map(tempoAnima, 0, this.tIntro, 0, this.brilhoOrig)
+      // } else if (tempoAnima > 1 - this.tOutro) {
+      //   this.brilhoAtual = map(tempoAnima, 1 - this.tOutro, 1, this.brilhoOrig, 0)
+      // } else this.brilhoAtual = this.brilhoOrig
+      let res = 0.05
+      let a = tempoAnima * TWO_PI
+      let xNoise = cos(a) * res + this.randSeed
+      let yNoise = sin(a) * res + this.randSeed
+      this.angle = noise(xNoise, yNoise) * 2 * TWO_PI
       this.strk = map(this.brilhoAtual, 0, 255, 0, this.dis)
     }
 
@@ -274,19 +321,21 @@ celulas = [
     }
   },
 
-  function(pos, brilho, bounds) { // CIRCULAR FLOW FIELD
-    this.posR = pos.copy()
-    this.posD = pos.copy()
-    this.pos0 = pos.copy()
+  function(brilho, bounds) { // CIRCULAR FLOW FIELD
+    this.bounds = bounds
     this.brilho = brilho
-    this.tamCelula = max(bounds.w,bounds.h)
+    this.pos0 = createVector(this.bounds.x + round(this.bounds.w * 0.5), this.bounds.y + round(this.bounds.h * 0.5))
+    this.posR = this.pos0.copy()
+    this.posD = this.pos0.copy()
+    this.tamCelula = max(bounds.w, bounds.h)
     this.raioD = 0
     this.raioR = 0
     this.maxRaio = map(brilho, 0, 1, 0, this.tamCelula * 0.5)
     this.tStartMotion = random(0.5, 0.9)
-    this.random = random(PI)
+    this.random = random(1)
 
     this.atualiza = function(tempoAnima) {
+      tempoAnima = (tempoAnima + this.random) % 1
       let tIntro = 0.1
       if (tempoAnima < tIntro) {
         this.raioD = map(tempoAnima, 0, tIntro, 0, this.maxRaio)
@@ -298,14 +347,16 @@ celulas = [
         let res = 0.005
         let a = noise(this.posD.x * res, this.posD.y * res) * 2 * TWO_PI
         let v = p5.Vector.fromAngle(a)
-        v.setMag(tempoAnima * 5)
+        v.setMag(3)
         this.posD.add(v)
       } else this.posD = this.pos0.copy()
       if (tempoAnima == 0) {
         this.reset()
       }
-      this.posR.lerp(this.posD, 0.1)
-      this.raioR = lerp(this.raioR, this.raioD, 0.1)
+      // this.posR.lerp(this.posD, 0.1)
+      // this.raioR = lerp(this.raioR, this.raioD, 0.1)
+      this.raioR = this.raioD
+      this.posR = this.posD
     }
 
     this.reset = function() {
@@ -328,16 +379,17 @@ celulas = [
     }
   },
 
-  function(pos, brilho, bounds) { // CRIPTICO
-    this.pos0 = pos
+  function(brilho, bounds) { // CRIPTICO
     this.brilhoOrig = brilho * 255
     this.bounds = bounds
+    this.pos0 = createVector(this.bounds.x + round(this.bounds.w * 0.5), this.bounds.y + round(this.bounds.h * 0.5))
     this.brilhoAtual = 0
-    this.tIntro = random(0.2, 0.4)
-    this.tOutro = random(0.2, 0.4)
+    this.tIntro = random(0.1, 0.2)
+    this.tOutro = random(0.1, 0.2)
+    this.randSeed = random(1)
 
     this.atualiza = function(tempoAnima) {
-
+      tempoAnima = (tempoAnima + this.randSeed) % 1
       if (tempoAnima < this.tIntro) {
         this.brilhoAtual = map(tempoAnima, 0, this.tIntro, 0, this.brilhoOrig)
       } else if (tempoAnima > 1 - this.tOutro) {
@@ -449,6 +501,376 @@ celulas = [
         cnv.rect(0, 0, t, t);
       }
       cnv.pop()
+    }
+  },
+
+  // //------------------------------------------------------------------->
+
+  function(brilho, bounds) {
+    this.bounds = bounds;
+    this.brilho = brilho;
+    this.randSeed = random(TWO_PI)
+
+    this.atualiza = function(tempoAnima) {
+      this.tempoAnima = norm(sin(tempoAnima*TWO_PI*3 + this.randSeed),-1,1);
+    };
+
+    this.desenha = function() {
+      let esp = this.bounds.w / 20 * this.tempoAnima + 0.5;
+      stroke(cor_shape);
+      strokeWeight(esp);
+      noFill();
+      let circ_qtd = floor(map(this.brilho, 0, 1, 1, 5));
+
+      for (let i = 0; i < circ_qtd; i++) {
+        let d = (esp * 4) * i;
+        circle(this.bounds.x + this.bounds.w / 2, this.bounds.y + this.bounds.h / 2, d);
+      }
+    };
+
+    this.salva = function(cnv) {
+      let esp = this.bounds.w / 20 * this.tempoAnima + 0.5;
+      cnv.stroke(cor_shape);
+      cnv.strokeWeight(esp);
+      cnv.noFill();
+      let circ_qtd = floor(map(this.brilho, 0, 1, 1, 5));
+
+      for (let i = 0; i < circ_qtd; i++) {
+        let d = (esp * 4) * i;
+        cnv.circle(this.bounds.x + this.bounds.w / 2, this.bounds.y + this.bounds.h / 2, d);
+      }
+    };
+
+  },
+
+  //------------------------------------------------------------------->
+
+  function(brilho, bounds) {
+    this.bounds = bounds;
+    this.brilho = brilho;
+    this.randSeed = random(TWO_PI)
+
+    this.atualiza = function(tempoAnima) {
+      this.tempoAnima = norm(sin(tempoAnima*TWO_PI*3 + this.randSeed),-1,1);
+    };
+
+    this.desenha = function() {
+      let rect_grid = 3;
+      let rect_max = rect_grid * rect_grid;
+      let rect_qtd = floor(map(this.brilho, 0, 1, 0, rect_max));
+
+      for (let i = 0; i < rect_max; i++) {
+        let blink = random(1) + i / rect_max;
+
+        if (i <= rect_qtd && blink > 0.3) {
+          let largura = this.bounds.w / rect_grid;
+          let altura = this.bounds.h / rect_grid;
+          let x = this.bounds.x + (i % rect_grid) * largura;
+          let y = this.bounds.y + floor(i / rect_grid) * altura;
+          noStroke();
+          fill(cor_shape);
+          rect(x, y, largura, altura);
+        }
+      }
+    };
+
+    this.salva = function(cvn) {
+      let rect_grid = 3;
+      let rect_max = rect_grid * rect_grid;
+      let rect_qtd = floor(map(this.brilho, 0, 1, 0, rect_max));
+
+      for (let i = 0; i < rect_max; i++) {
+        let blink = random(1) + i / rect_max;
+
+        if (i <= rect_qtd && blink > 0.3) {
+          let largura = this.bounds.w / rect_grid;
+          let altura = this.bounds.h / rect_grid;
+          let x = this.bounds.x + (i % rect_grid) * largura;
+          let y = this.bounds.y + floor(i / rect_grid) * altura;
+          cvn.noStroke();
+          cvn.fill(cor_shape);
+          cvn.rect(x, y, largura, altura);
+        }
+      }
+    };
+  },
+
+  //------------------------------------------------------------------->
+
+  function(brilho, bounds) {
+    this.bounds = bounds;
+    this.brilho = brilho;
+    this.randSeed = random(TWO_PI)
+
+    this.atualiza = function(tempoAnima) {
+      this.tempoAnima = norm(sin(tempoAnima*TWO_PI*3 + this.randSeed),-1,1);
+    };
+
+    this.desenha = function() {
+      let esfera_qtd = floor(map(this.brilho, 0, 0.9, 1, 4));
+      let contorno_esp = this.tempoAnima * (20 * this.brilho) / esfera_qtd + 1;
+      stroke(cor_shape);
+      strokeWeight(contorno_esp);
+      noFill()
+      for (let i = 0; i < esfera_qtd; i++) {
+        for (let j = 0; j < esfera_qtd; j++) {
+
+
+          let largura = this.bounds.w / esfera_qtd;
+          let altura = this.bounds.h / esfera_qtd;
+          let x = this.bounds.x + largura / 2 + i * largura;
+          let y = this.bounds.y + altura / 2 + j * altura;
+          ellipse(x, y, largura, altura);
+
+        }
+      }
+    };
+
+    this.salva = function(cvn) {
+      let esfera_qtd = floor(map(this.brilho, 0, 0.9, 1, 4));
+      let contorno_esp = this.tempoAnima * (20 * this.brilho) / esfera_qtd + 1;
+      cvn.stroke(cor_shape);
+      cvn.strokeWeight(contorno_esp);
+      cvn.noFill()
+      for (let i = 0; i < esfera_qtd; i++) {
+        for (let j = 0; j < esfera_qtd; j++) {
+
+
+          let largura = this.bounds.w / esfera_qtd;
+          let altura = this.bounds.h / esfera_qtd;
+          let x = this.bounds.x + largura / 2 + i * largura;
+          let y = this.bounds.y + altura / 2 + j * altura;
+          cvn.ellipse(x, y, largura, altura);
+
+        }
+      }
+    };
+  },
+
+  //------------------------------------------------------------------->
+
+  function(brilho, bounds) {
+    this.bounds = bounds;
+    this.brilho = brilho;
+    this.randSeed = random(TWO_PI)
+
+    this.atualiza = function(tempoAnima) {
+      this.tempoAnima = norm(sin(tempoAnima*TWO_PI*3 + this.randSeed),-1,1);
+    };
+
+    this.desenha = function() {
+      let traco_qtd = floor(map(this.brilho, 0, 0.7, 1, 6));
+      push();
+      noStroke();
+      fill(cor_shape);
+      rectMode(CENTER);
+      translate(this.bounds.x + this.bounds.w / 2, this.bounds.y + this.bounds.h / 2);
+      rotate(this.tempoAnima * PI);
+      for (let i = 0; i < traco_qtd; i++) {
+        rotate(PI / traco_qtd);
+        rect(0, 0, this.bounds.w / 10, this.bounds.h);
+      };
+      pop();
+    };
+
+    this.salva = function(cvn) {
+      let traco_qtd = floor(map(this.brilho, 0, 0.7, 1, 6));
+      cvn.push();
+      cvn.noStroke();
+      cvn.fill(cor_shape);
+      cvn.rectMode(CENTER);
+      cvn.translate(this.bounds.x + this.bounds.w / 2, this.bounds.y + this.bounds.h / 2);
+      cvn.rotate(this.tempoAnima * PI);
+      for (let i = 0; i < traco_qtd; i++) {
+        cvn.rotate(PI / traco_qtd);
+        cvn.rect(0, 0, this.bounds.w / 10, this.bounds.h);
+      };
+      cvn.pop();
+    };
+  },
+
+  //------------------------------------------------------------------->
+
+  function(brilho, bounds) {
+    this.bounds = bounds;
+    this.brilho = brilho;
+    this.randSeed = random(TWO_PI)
+
+    this.atualiza = function(tempoAnima) {
+      this.tempoAnima = norm(sin(tempoAnima*TWO_PI*3 + this.randSeed),-1,1);
+    };
+
+    this.desenha = function() {
+      push();
+      noStroke();
+
+      fill(cor_shape);
+      let angulo_inicial = this.brilho * TWO_PI;
+      let angulo = this.tempoAnima * TWO_PI;
+      let largura = map(brilho, 0, 0.9, 2, this.bounds.w);
+      rectMode(CENTER);
+      translate(this.bounds.x + this.bounds.w / 2, this.bounds.y + this.bounds.h / 2);
+      rotate(angulo + angulo_inicial);
+      rect(0, 0, largura, this.bounds.h);
+      pop();
+    }
+
+    this.salva = function(cvn) {
+      cvn.push();
+      cvn.noStroke();
+
+      cvn.fill(cor_shape);
+      let angulo_inicial = this.brilho * TWO_PI;
+      let angulo = this.tempoAnima * TWO_PI;
+      let largura = map(brilho, 0, 0.9, 2, this.bounds.w);
+      cvn.rectMode(CENTER);
+      cvn.translate(this.bounds.x + this.bounds.w / 2, this.bounds.y + this.bounds.h / 2);
+      cvn.rotate(angulo + angulo_inicial);
+      cvn.rect(0, 0, largura, this.bounds.h);
+      cvn.pop();
+    }
+  },
+
+  //-------------------------------------------------------------->
+
+  function(brilho, bounds) {
+    this.bounds = bounds;
+    this.brilho = brilho;
+    this.randSeed = random(TWO_PI)
+
+    this.atualiza = function(tempoAnima) {
+      this.tempoAnima = norm(sin(tempoAnima*TWO_PI*3 + this.randSeed),-1,1);
+    };
+
+    this.desenha = function() {
+      fill(cor_shape);
+      noStroke();
+
+      let angulo_maximo = map(this.brilho, 0, 1, 0, TWO_PI - 0.01);
+      let angulo = this.tempoAnima * angulo_maximo;
+      arc(
+        bounds.x + bounds.w / 2,
+        bounds.y + bounds.h / 2,
+        bounds.w,
+        bounds.h,
+        0,
+        angulo + 0.0001
+      );
+    }
+
+    this.salva = function(cvn) {
+      cvn.fill(cor_shape);
+      cvn.noStroke();
+
+      let angulo_maximo = map(this.brilho, 0, 1, 0, TWO_PI - 0.01);
+      let angulo = this.tempoAnima * angulo_maximo;
+      cvn.arc(
+        bounds.x + bounds.w / 2,
+        bounds.y + bounds.h / 2,
+        bounds.w,
+        bounds.h,
+        0,
+        angulo + 0.0001
+      );
+    }
+  },
+
+  //-------------------------------------------------------------->
+
+  function(brilho, bounds) {
+    this.bounds = bounds;
+    this.brilho = brilho;
+    this.randSeed = random(TWO_PI)
+
+    this.atualiza = function(tempoAnima) {
+      this.tempoAnima = norm(sin(tempoAnima*TWO_PI*3 + this.randSeed),-1,1);
+    };
+
+    this.desenha = function() {
+      noStroke();
+      fill(cor_shape);
+
+      let esfera_qtd = floor(map(this.brilho, 0, 1, 1, 5));
+
+      for (let i = 0; i < esfera_qtd; i++) {
+        let largura = this.bounds.w / esfera_qtd;
+        let x = this.bounds.x + largura / 2 + i * largura;
+        let altura = this.tempoAnima * this.bounds.h + 1;
+        let y = this.bounds.y + this.bounds.h / 2;
+        ellipse(x, y, largura, altura);
+      }
+    }
+
+    this.salva = function(cvn) {
+      cvn.noStroke();
+      cvn.fill(cor_shape);
+
+      let esfera_qtd = floor(map(this.brilho, 0, 1, 1, 5));
+
+      for (let i = 0; i < esfera_qtd; i++) {
+        let largura = this.bounds.w / esfera_qtd;
+        let x = this.bounds.x + largura / 2 + i * largura;
+        let altura = this.tempoAnima * this.bounds.h + 1;
+        let y = this.bounds.y + this.bounds.h / 2;
+        cvn.ellipse(x, y, largura, altura);
+      }
+    }
+  },
+
+  //-------------------------------------------------------------->
+
+
+  function(brilho, bounds) {
+    this.bounds = bounds;
+    this.brilho = brilho;
+    this.randSeed = random(TWO_PI)
+
+    this.atualiza = function(tempoAnima) {
+      this.tempoAnima = norm(sin(tempoAnima*TWO_PI*3 + this.randSeed),-1,1);
+    };
+
+    this.desenha = function() {
+      noStroke();
+      fill(cor_shape);
+
+      let dobras = floor(map(this.brilho, 0, 1, 1, 4));
+
+      beginShape();
+      vertex(this.bounds.x + this.bounds.w / 2, this.bounds.y);
+
+      for (let i = 0; i < dobras; i++) {
+        let altura = this.bounds.h / dobras;
+        let y = this.bounds.y + altura / 2 + i * altura;
+        let x_desl = this.tempoAnima * (this.bounds.w / 2.1);
+        let xA = this.bounds.x + x_desl;
+        let xB = this.bounds.x + this.bounds.w - x_desl;
+        vertex(xA, y);
+        vertex(xB, y);
+      }
+      vertex(this.bounds.x + this.bounds.w / 2, this.bounds.y + this.bounds.h);
+      endShape(CLOSE);
+    }
+
+    this.salva = function(cvn) {
+      cvn.noStroke();
+      cvn.fill(cor_shape);
+
+      let dobras = floor(map(this.brilho, 0, 1, 1, 4));
+
+      cvn.beginShape();
+      cvn.vertex(this.bounds.x + this.bounds.w / 2, this.bounds.y);
+
+      for (let i = 0; i < dobras; i++) {
+        let altura = this.bounds.h / dobras;
+        let y = this.bounds.y + altura / 2 + i * altura;
+        let x_desl = this.tempoAnima * (this.bounds.w / 2.1);
+        let xA = this.bounds.x + x_desl;
+        let xB = this.bounds.x + this.bounds.w - x_desl;
+        cvn.vertex(xA, y);
+        cvn.vertex(xB, y);
+      }
+      cvn.vertex(this.bounds.x + this.bounds.w / 2, this.bounds.y + this.bounds.h);
+      cvn.endShape(CLOSE);
     }
   }
 ]
