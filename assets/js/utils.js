@@ -8,6 +8,16 @@ function save_svg() {
   cnv.save("PCD-BR_" + date + ".svg");
 }
 
+function save_png() {
+  var date = new Date().toLocaleString();
+  var cnv = createGraphics(currentImage.width, currentImage.height);
+  cnv.pixelDensity(1);
+  // cnv.background(cor_bg)
+  qTree.save(cnv)
+
+  cnv.save("PCD-BR_" + date + ".png");
+}
+
 function randCell(n) {
   let nRand = floor(random(celulas.length))
   if (nRand == n) return randCell(n)
